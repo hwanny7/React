@@ -14,6 +14,7 @@ function App() {
   const initCall = async () => {
     await getMedia();
     makeConnection();
+    socketRef.current.emit("join_room", roomName )
   }
 
 
@@ -37,25 +38,28 @@ function App() {
         {
           urls: [
             "stun:stun.l.google.com:19302",
-            "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302",
-            "stun:stun3.l.google.com:19302",
-            "stun:stun4.l.google.com:19302",
+            // "stun:stun1.l.google.com:19302",
+            // "stun:stun2.l.google.com:19302",
+            // "stun:stun3.l.google.com:19302",
+            // "stun:stun4.l.google.com:19302",
           ],
         },
       ],
     });
-    peerRef.current.onIceCandidate = (e) => {
+    peerRef.current.onicecandidate = (e) => {
       socketRef.current.emit("ice", e.candidate, roomName);
     }
-    peerRef.current.onAddStream = (e) => {
-      remoteVideoRef.current.srcObject = e.stream;
+    peerRef.current.ontrack= (e) => {
+      console.log('상대방')
+      console.log(myStream)
+      console.log(e)
+      remoteVideoRef.current.srcObject = e.streams[0];
     }
-    console.log(peerRef.current)
     myStream
       .getTracks()
-      .forEach((track) => peerRef.current.addTrack(track, myStream))
-    console.log(peerRef.current)
+      .forEach((track) => {
+        peerRef.current.addTrack(track, myStream)
+      })
   }
 
 
@@ -84,7 +88,7 @@ useEffect(() => {
     peerRef.current.setRemoteDescription(offer);
     const answer = await peerRef.current.createAnswer();
     peerRef.current.setLocalDescription(answer);
-    socketRef.emit("answer", answer, roomName);
+    socketRef.current.emit("answer", answer, roomName);
     console.log("sent the answer");
   });
   
@@ -94,8 +98,8 @@ useEffect(() => {
   });
   
   socketRef.current.on("ice", (ice) => {
-    console.log("received candidate");
     peerRef.current.addIceCandidate(ice);
+    console.log("received candidate");
   });
 })
 
