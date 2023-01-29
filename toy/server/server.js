@@ -4,7 +4,7 @@ const cors = require('cors')
 app.use(cors());
 // app이 cors를 사용한다고 먼저 선언한 다음에 server 만들 때 인자로 넘겨줘야함
 const httpServer = require('http').createServer(app)
-const wsServer = require('socket.io')(httpServer, { cors: {origin: "http://localhost:3000", methods: ["GET", "POST"]}})
+const wsServer = require('socket.io')(httpServer, { cors: {origin: "*", methods: ["GET", "POST"]}})
 
 app.get("/", (req, res) => {
     res.json({"users":"hi"})
