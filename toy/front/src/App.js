@@ -51,7 +51,6 @@ function App() {
     }
     peerRef.current.ontrack= (e) => {
       console.log('상대방')
-      console.log(myStream)
       console.log(e)
       remoteVideoRef.current.srcObject = e.streams[0];
     }
